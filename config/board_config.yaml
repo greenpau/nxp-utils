@@ -1,0 +1,11 @@
+board_config:
+  name: "FRDM-K64F-Custom"
+  mapping:
+    - signal: "GPIOB_22"
+      pin: "PTB22"
+      label: "RED_LED"
+      pull: "up" # pull_select: up, pull_enable: enable
+      drive_strength: "high"
+      slew_rate: "slow" # Standard for LEDs to reduce EMI
+      passive_filter: true # If it was a button input
+      gpio_init_state: false # This tells the builder the LED is "Off" at boot (Active-Low)

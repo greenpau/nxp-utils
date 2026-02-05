@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nxp_utils"
+version = "1.1.1"
+description = "NXP Microcontroller Utilities library"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyyaml>=6.0.1",
+]
+
+[tool.setuptools]
+packages = ["nxp_utils"]

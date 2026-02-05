@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import traceback
+import argparse
+import re
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from nxp_utils import Assistant
+
+DEFAULT_CONFIG_TOOLS_DATA_PATH = "ConfigToolsData_FRDM-K64F_v25_12.zip"
+
+
+def main():
+    script_name = re.sub('[.]py[c]?', '', os.path.basename(__file__))
+    assistant = Assistant(name=script_name)
+    parser = argparse.ArgumentParser(script_name, formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    action_group = parser.add_argument_group('Action')
+    action_selection_group = action_group.add_mutually_exclusive_group(required=True)
+    action_selection_group.add_argument("--build-dts", dest='build_dts', action="store_true", help="Build DTS")
+    action_selection_group.add_argument("--query-dts", dest='query_dts', action="store_true", help="Query DTS")
+
+    controller_group = parser.add_argument_group('Controller')
+    controller_group.add_argument("--controller-type",
+                                  dest='controller_type',
+                                  metavar="TYPE",
+                                  type=str,
+                                  choices=['IOMUX', 'IOCON', 'PORT'],
+                                  help="SOC pin controller type")
+
+    config_group = parser.add_argument_group('Config')
+    config_group.add_argument("--user-board-config-file",
+                              dest='user_board_config_file_path',
+                              metavar="PATH",
+                              type=str,
+                              help="User-selected board configuration file")
+
+    config_tools_data = parser.add_argument_group('Config Tools Data')
+    config_tools_data.add_argument("--input-config-tools-data-file",
+                                   dest='config_tools_data_file_path',
+                                   metavar="PATH",
+                                   type=str,
+                                   default=f"downloads/{DEFAULT_CONFIG_TOOLS_DATA_PATH}",
+                                   help=f"Path to downloaded ConfigToolsData package zip, e.g. {DEFAULT_CONFIG_TOOLS_DATA_PATH}")
+    config_tools_data.add_argument(
+        "--input-mex-file",
+        dest='mex_file_path',
+        metavar="PATH",
+        type=str,
+        help=f"Path or name of MEX file. It could be outside of package zip, e.g. boards/FRDM-K64F/ksdk2_0/FRDM-K64F.mex")
+
+    query_group = parser.add_argument_group('Query')
+    query_group.add_argument("--find-base-pin", dest='query_type', action='store_const', const='find_base_pin', help="Find base_pin query")
+    query_group.add_argument("pin_name", nargs='?', help="The pin identifier (e.g., PTC15)")
+
+    output_group = parser.add_argument_group('Output')
+    output_group.add_argument("--output-dts-path",
+                              dest='output_dts_path',
+                              metavar="PATH",
+                              type=str,
+                              help="Output path for board level DTS file")
+
+    logging_group = parser.add_argument_group('Logging and Debugging')
+    logging_group.add_argument('-l',
+                               '--log-level',
+                               dest='log_level',
+                               metavar='LEVEL',
+                               type=str,
+                               default="debug",
+                               choices=['debug', 'info', 'warning'],
+                               help='Log level (default: debug)')
+
+    args = parser.parse_args()
+    if args.log_level == "info":
+        assistant.set_log_level('INFO')
+    elif args.log_level == "warning":
+        assistant.set_log_level('WARNING')
+    else:
+        assistant.set_log_level('DEBUG')
+
+    try:
+        fn_args = {}
+        if args.build_dts:
+            fn_args["action"] = "build_dts"
+            fn_args["controller_type"] = args.controller_type
+            fn_args["config_tools_data_file_path"] = args.config_tools_data_file_path
+            fn_args["mex_file_path"] = args.mex_file_path
+            fn_args["output_dts_path"] = args.output_dts_path
+            fn_args["user_board_config_file_path"] = args.user_board_config_file_path
+        elif args.query_dts:
+            fn_args["action"] = "query_dts"
+            fn_args["controller_type"] = args.controller_type
+            fn_args["config_tools_data_file_path"] = args.config_tools_data_file_path
+            fn_args["query_type"] = args.query_type
+            if args.pin_name:
+                fn_args["query_args"] = [args.pin_name]
+
+        else:
+            raise Exception("unsupported operation")
+
+        return assistant.run(**fn_args)
+    except Exception as e:
+        traceback.print_exc()
+        parser.error(e)
+        # raise Exception(e)
+    return
+
+
+if __name__ == '__main__':
+    main()

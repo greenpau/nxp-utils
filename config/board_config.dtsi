@@ -1,0 +1,21 @@
+&pinctrl {
+    gpiob_default: gpiob_default {
+        group1 {
+            pinmux = <
+                K64_PSEL(B, 22, 0x1) /* RED_LED */
+            >;
+            bias-pull-up;
+            drive-strength = "high";
+            slew-rate = "slow";
+            passive-filter;
+        };
+    };
+};
+
+&gpiob {
+    status = "okay";
+    red_led {
+        gpios = <&gpiob 22 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+        output-low;
+    };
+};

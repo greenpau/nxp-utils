@@ -1,0 +1,22 @@
+{
+  "tabWidth": 4,
+  "useTabs": false,
+  "printWidth": 140,
+  "overrides": [
+    {
+      "files": "*.{yaml,yml}",
+      "options": {
+        "tabWidth": 2
+      }
+    },
+    {
+      "files": "*.html",
+      "options": {
+        "bracketSameLine": true,
+        "tabWidth": 2,
+        "htmlWhitespaceSensitivity": "ignore",
+        "singleAttributePerLine": false
+      }
+    }
+  ]
+}

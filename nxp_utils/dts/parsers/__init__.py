@@ -1,0 +1,4 @@
+from .functional_properties_parser import parse_functional_properties
+from .peripherals_parser import parse_peripherals
+from .peripheral_types_parser import parse_peripheral_types
+from .signal_to_pin_map_parser import parse_signal_to_pin_map

@@ -1,0 +1,15 @@
+---
+extends: default
+
+rules:
+  line-length:
+    max: 140
+
+  indentation:
+    spaces: 2
+    indent-sequences: false
+    check-multi-line-strings: true
+
+  colons: enable
+  hyphens: enable
+  trailing-spaces: enable
